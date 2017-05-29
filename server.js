@@ -58,6 +58,22 @@ var initDb = function(callback) {
   });
 };
 
+ io.on('connection', function(socket){
+   // Incrementa o total de visitas no site.
+   visitas++;
+   // Envia o total de visitas para o novo usuário.
+   socket.emit('visits', visitas);
+   // Envia o total de visitas para os demais usuários.
+   socket.broadcast.emit('visits', visitas);
+   // Evento disconnect ocorre quando sai um usuário.
+   socket.on('disconnect', function(){
+     visitas--;
+     // Atualiza o total de visitas para os demais usuários.
+     socket.broadcast.emit('message', visitas);
+     
+   });
+
+
 app.get('/', function (req, res) {
   // try to initialize the db on every request if it's not already
   // initialized.
