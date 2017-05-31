@@ -3,7 +3,10 @@ var express = require('express'),
     fs      = require('fs'),
     app     = express(),
     eps     = require('ejs'),
-    morgan  = require('morgan');
+    morgan  = require('morgan'),
+    http = require('http'),
+    server = http.createServer(app),
+	io = require('socket.io').listen(server, {'heartbeat interval': 5, 'heartbeat timeout' : 10});
     
 Object.assign=require('object-assign')
 
@@ -105,3 +108,4 @@ app.listen(port, ip);
 console.log('Server running on http://%s:%s', ip, port);
 
 module.exports = app ;
+
