@@ -6,7 +6,7 @@ var express = require('express'),
     morgan  = require('morgan'),
     http = require('http'),
     server = http.createServer(app),
-	io = require('socket.io').listen(server);
+	io = require('socket.io').listen(server, {'heartbeat interval': 5, 'heartbeat timeout' : 10});
     
 Object.assign=require('object-assign')
 
@@ -105,7 +105,6 @@ initDb(function(err){
 });
 
 app.listen(port, ip);
-
 console.log('Server running on 2 http://%s:%s', ip, port);
 
 module.exports = app ;
@@ -114,9 +113,11 @@ console.log('teste 2');
 
 io.on('connection', function(socket){
 
+
+
       socket.on('disconnect', function() {
 
-});
+      });
 
 });
 console.log('teste 3');
