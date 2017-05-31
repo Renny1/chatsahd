@@ -6,7 +6,7 @@ var express = require('express'),
     morgan  = require('morgan'),
     http = require('http'),
     server = http.createServer(app),
-	io = require('socket.io').listen(server, {'heartbeat interval': 5, 'heartbeat timeout' : 10});
+	io = require('socket.io').listen(server);
     
 Object.assign=require('object-assign')
 
@@ -109,6 +109,8 @@ console.log('Server running on 2 http://%s:%s', ip, port);
 
 module.exports = app ;
 
+console.log('teste 2');
+
 io.on('connection', function(socket){
 
 
@@ -118,3 +120,7 @@ io.on('connection', function(socket){
       });
 
 });
+console.log('teste 3');
+//server.listen(8080, "127.0.0.1");
+
+console.log('teste 4');
