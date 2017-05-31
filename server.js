@@ -105,6 +105,7 @@ initDb(function(err){
 });
 
 app.listen(port, ip);
+
 console.log('Server running on 2 http://%s:%s', ip, port);
 
 module.exports = app ;
@@ -113,11 +114,9 @@ console.log('teste 2');
 
 io.on('connection', function(socket){
 
-
-
       socket.on('disconnect', function() {
 
-      });
+});
 
 });
 console.log('teste 3');
