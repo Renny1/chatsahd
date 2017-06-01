@@ -4,6 +4,7 @@ var express = require('express'),
     app     = express(),
     eps     = require('ejs'),
     morgan  = require('morgan');
+
     
 Object.assign=require('object-assign')
 
@@ -102,6 +103,54 @@ initDb(function(err){
 });
 
 app.listen(port, ip);
-console.log('Server running on http://%s:%s', ip, port);
+console.log('Server running on 2 http://%s:%s', ip, port);
 
 module.exports = app ;
+
+    var http = require('http'),
+    server = http.createServer(app);
+
+
+    server = app.listen(port, ipaddress, function() {
+            console.log('%s: Node server started on %s:%d ...',
+                Date(Date.now()), ipaddress, port);
+        });
+    
+   io = require('socket.io').listen(server);
+
+      var msg = {
+                'id': '',
+                'user': '',
+                'room': '',
+                'text': '',
+                'time': '',
+                'advice': true
+            };
+
+io.on('connection', function(socket){
+
+/*    socket.on('connect', function() {
+    console.log("Alguem Conectou 1");
+    });
+*/
+    socket.on('join:room', function(data){
+      console.log("Alguem Conectou 2");
+    });
+
+    socket.on('leave:room', function(msg){
+
+    });
+
+    socket.on('send:message', function(msg){
+        socket.in(msg.room).emit('message', msg);
+    });
+
+    socket.on('disconnect', function() {
+
+    });
+
+});
+
+
+console.log('Rodando 2');
+//server.listen(8080, "127.0.0.1");
