@@ -7,7 +7,7 @@ var express = require('express'),
     http = require('http'),
     server = http.createServer(app),
 	io = require('socket.io').listen(server);
-  io.set('transports', [ 'polling', 'websocket' ]);
+    
 Object.assign=require('object-assign')
 
 app.engine('html', require('ejs').renderFile);
@@ -105,7 +105,7 @@ initDb(function(err){
 });
 
 app.listen(port, ip);
-console.log('Server running on 2 http://%s:%s', ip, port);
+console.log('Server running on 3 http://%s:%s', ip, port);
 
 module.exports = app ;
 
@@ -175,5 +175,5 @@ console.log("Alguem Conectou 1");
 });
 
 
-console.log('Rodando 3');
+console.log('Rodando 4');
 //server.listen(8080, "127.0.0.1");
