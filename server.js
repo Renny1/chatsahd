@@ -3,10 +3,7 @@ var express = require('express'),
     fs      = require('fs'),
     app     = express(),
     eps     = require('ejs'),
-    morgan  = require('morgan'),
-    http = require('http'),
-    server = http.createServer(app),
-	io = require('socket.io').listen(server);
+    morgan  = require('morgan');
     
 Object.assign=require('object-assign')
 
@@ -105,75 +102,6 @@ initDb(function(err){
 });
 
 app.listen(port, ip);
-console.log('Server running on 3 http://%s:%s', ip, port);
+console.log('Server running on http://%s:%s', ip, port);
 
 module.exports = app ;
-
-      var msg = {
-                'id': '',
-                'user': '',
-                'room': '',
-                'text': '',
-                'time': '',
-                'advice': true
-            };
-
-io.on('connection', function(socket){
-
-
-socket.on('connect', function() {
-console.log("Alguem Conectou 1");
-
-});
-
-   socket.on('join:room', function(data){
-      console.log("Alguem Conectou 2");
-        var room_name = data.room_name;
-        socket.join(room_name);
-        socket.room = room_name;
-        socket.user = data.user;
-        data.text = data.user + " entrou no chat";
-        socket.in(socket.room).emit('entrou', data);
-        io.in(socket.room).emit('qtd', io.sockets.adapter.rooms['Chat'].length);
-        console.log(data.user +" entrou no " +room_name);
-
-    });
-
-    socket.on('leave:room', function(msg){
-        msg.text = msg.user + " saiu do chat";
-        socket.leave(socket.room);
-        if(io.sockets.adapter.rooms['Chat']){
-            var teste = io.sockets.adapter.rooms['Chat'].length;
-        }else{
-            var teste = 0;
-        }
-        socket.in(msg.room).emit('exit', msg);
-        
-        socket.in(msg.room).emit('qtd', teste);
-
-         console.log(msg.user +" saiu do " + msg.room);
-    });
-
-
-    socket.on('send:message', function(msg){
-        socket.in(msg.room).emit('message', msg);
-    });
-
-      socket.on('disconnect', function() {
-        msg.text = socket.user + " saiu do chat";
-        socket.leave(socket.room);
-        if(io.sockets.adapter.rooms['Chat']){
-            var teste = io.sockets.adapter.rooms['Chat'].length;
-        }else{
-            var teste = 0;
-        }
-        socket.in(socket.room).emit('exit', msg);
-        io.in(socket.room).emit('qtd', teste );
-        console.log(socket.user +" saiu do " + socket.room);
-      });
-
-});
-
-
-console.log('Rodando 4');
-//server.listen(8080, "127.0.0.1");
