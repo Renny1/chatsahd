@@ -4,9 +4,12 @@ var express = require('express'),
     app     = express(),
     eps     = require('ejs'),
     morgan  = require('morgan'),
-    http = require('http'),
-    server = http.createServer(app),
-	io = require('socket.io').listen(server, {'heartbeat interval': 5, 'heartbeat timeout' : 10});
+/*    http = require('http'),
+    server = http.createServer(app),*/
+
+  server = require('http').Server(app),
+
+	io = require('socket.io').listen(server);
     
 Object.assign=require('object-assign')
 
@@ -120,10 +123,10 @@ module.exports = app ;
 
 io.on('connection', function(socket){
 
+console.log("conectando");
 
 socket.on('connect', function() {
 console.log("Alguem Conectou 1");
-
 });
 
    socket.on('join:room', function(data){
@@ -148,17 +151,12 @@ console.log("Alguem Conectou 1");
             var teste = 0;
         }
         socket.in(msg.room).emit('exit', msg);
-        
         socket.in(msg.room).emit('qtd', teste);
-
-         console.log(msg.user +" saiu do " + msg.room);
+        console.log(msg.user +" saiu do " + msg.room);
     });
-
-
     socket.on('send:message', function(msg){
         socket.in(msg.room).emit('message', msg);
     });
-
       socket.on('disconnect', function() {
         msg.text = socket.user + " saiu do chat";
         socket.leave(socket.room);
@@ -171,10 +169,6 @@ console.log("Alguem Conectou 1");
         io.in(socket.room).emit('qtd', teste );
         console.log(socket.user +" saiu do " + socket.room);
       });
-
-
-
-
 });
 console.log('Rodando');
 //server.listen(8080, "127.0.0.1");
