@@ -7,10 +7,9 @@ var express = require('express'),
     http = require('http'),
     server = http.createServer(app),
 	io = require('socket.io').listen(server);
-  io.set('transports', ['websocket']);
-
-  
+  io.set('transports', [ 'polling', 'websocket' ]);
 Object.assign=require('object-assign')
+
 app.engine('html', require('ejs').renderFile);
 app.use(morgan('combined'))
 
@@ -176,5 +175,5 @@ console.log("Alguem Conectou 1");
 });
 
 
-console.log('Rodando 2');
+console.log('Rodando 3');
 //server.listen(8080, "127.0.0.1");
