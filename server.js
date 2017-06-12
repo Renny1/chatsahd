@@ -117,6 +117,9 @@ module.exports = app ;
      io = require('socket.io').listen(server);
 
 
+     io.set('transports', [ 'polling', 'websocket' ]);
+
+
 io.on('connection', function(socket){
 
 
