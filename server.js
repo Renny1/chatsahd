@@ -11,7 +11,7 @@ Object.assign=require('object-assign')
 app.engine('html', require('ejs').renderFile);
 app.use(morgan('combined'))
 
-var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 3000,
+var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8000,
     ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1',
     mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL,
     mongoURLLabel = "";
@@ -127,13 +127,13 @@ module.exports = app ;
                 ]);
 
             io.on('connection', function(socket){
-socket.on('join:room', function(data) {
+              socket.on('join:room', function(data) {
 
-console.log("join");
+              console.log("join");
 
 
-});
-            socket.on('disconnect', function() {
+              });
+              socket.on('disconnect', function() {
               
    /*             var index = users.indexOf(socket.id);
                 if (index >= 0) {
