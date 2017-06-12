@@ -115,7 +115,7 @@ module.exports = app ;
             console.log('%s: Node server started on %s:%d ...',
                 Date(Date.now()), ipaddress, port);
         });
-    
+
    io = require('socket.io').listen(server);
 
       var msg = {
@@ -129,25 +129,20 @@ module.exports = app ;
 
 io.on('connection', function(socket){
 
-/*    socket.on('connect', function() {
-    console.log("Alguem Conectou 1");
-    });
-*/
-    socket.on('join:room', function(data){
-      console.log("Alguem Conectou 2");
-    });
 
-    socket.on('leave:room', function(msg){
 
+setInterval(function() {
+    util.log('Checking for new jobs...');
+    dbCheckQueue(function(results) {  // checks if there are new rows to "distribute" to clients
+        if (results.length) {
+            util.log(results.length + ' new jobs found.');
+            io.sockets.emit('job_available');
+        }
     });
+}, 10*1000);
 
-    socket.on('send:message', function(msg){
-        socket.in(msg.room).emit('message', msg);
-    });
 
-    socket.on('disconnect', function() {
 
-    });
 
 });
 
