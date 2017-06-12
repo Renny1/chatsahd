@@ -116,23 +116,16 @@ module.exports = app ;
         });
      io = require('socket.io').listen(server);
 
-
-     io.use('transports', [
-                'websocket', 
-                'flashsocket', 
-                'htmlfile', 
-                'xhr-polling', 
-                'jsonp-polling', 
-                'polling'
-                ]);
-
             io.on('connection', function(socket){
+              
               socket.on('join:room', function(data) {
 
               console.log("join");
 
 
               });
+
+
               socket.on('disconnect', function() {
               
    /*             var index = users.indexOf(socket.id);
