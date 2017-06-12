@@ -118,7 +118,17 @@ module.exports = app ;
 
 
      io.set('transports', [ 'polling', 'websocket' ]);
-
+     
+var socket = io({
+  transports: [
+    'websocket', 
+    'flashsocket', 
+    'htmlfile', 
+    'xhr-polling', 
+    'jsonp-polling', 
+    'polling'
+  ]
+});
 
 io.on('connection', function(socket){
 
