@@ -125,5 +125,5 @@ io.on('connection', function(socket){
 });
 
 
-console.log('Rodando 4');
+console.log('Rodando 5');
 //server.listen(8080, "127.0.0.1");
