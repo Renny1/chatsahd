@@ -1,148 +1,145 @@
-//  OpenShift sample Node application
-var express = require('express'),
-    fs      = require('fs'),
-    app     = express(),
-    eps     = require('ejs'),
-    morgan  = require('morgan');
+#!/bin/env node
+ //  OpenShift sample Node application
+var express = require('express');
+var fs = require('fs');
 
-    
-Object.assign=require('object-assign')
 
-app.engine('html', require('ejs').renderFile);
-app.use(morgan('combined'))
+var SampleApp = function() {
+    var self = this;
+    self.setupVariables = function() {
+        //  Set the environment variables we need.
+        self.ipaddress = process.env.OPENSHIFT_NODEJS_IP;
+        self.port = process.env.OPENSHIFT_NODEJS_PORT || 8000;
 
-var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8000,
-    ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1',
-    mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL,
-    mongoURLLabel = "";
+        if (typeof self.ipaddress === "undefined") {
+            //  Log errors on OpenShift but continue w/ 127.0.0.1 - this
+            //  allows us to run/test the app locally.
+            console.warn('No OPENSHIFT_NODEJS_IP var, using 127.0.0.1');
+            self.ipaddress = "127.0.0.1";
+        };
+    };
 
-if (mongoURL == null && process.env.DATABASE_SERVICE_NAME) {
-  var mongoServiceName = process.env.DATABASE_SERVICE_NAME.toUpperCase(),
-      mongoHost = process.env[mongoServiceName + '_SERVICE_HOST'],
-      mongoPort = process.env[mongoServiceName + '_SERVICE_PORT'],
-      mongoDatabase = process.env[mongoServiceName + '_DATABASE'],
-      mongoPassword = process.env[mongoServiceName + '_PASSWORD']
-      mongoUser = process.env[mongoServiceName + '_USER'];
+    self.populateCache = function() {
+        if (typeof self.zcache === "undefined") {
+            self.zcache = {
+                'index.html': ''
+            };
+        }
+        self.zcache['index.html'] = fs.readFileSync('./index.html');
+    };
+    self.cache_get = function(key) {
+        return self.zcache[key];
+    };
 
-  if (mongoHost && mongoPort && mongoDatabase) {
-    mongoURLLabel = mongoURL = 'mongodb://';
-    if (mongoUser && mongoPassword) {
-      mongoURL += mongoUser + ':' + mongoPassword + '@';
-    }
-    // Provide UI label that excludes user id and pw
-    mongoURLLabel += mongoHost + ':' + mongoPort + '/' + mongoDatabase;
-    mongoURL += mongoHost + ':' +  mongoPort + '/' + mongoDatabase;
+    self.terminator = function(sig) {
+        if (typeof sig === "string") {
+            console.log('%s: Received %s - terminating sample app ...',
+                Date(Date.now()), sig);
+            process.exit(1);
+        }
+        console.log('%s: Node server stopped.', Date(Date.now()));
+    };
 
-  }
-}
-var db = null,
-    dbDetails = new Object();
-
-var initDb = function(callback) {
-  if (mongoURL == null) return;
-
-  var mongodb = require('mongodb');
-  if (mongodb == null) return;
-
-  mongodb.connect(mongoURL, function(err, conn) {
-    if (err) {
-      callback(err);
-      return;
-    }
-
-    db = conn;
-    dbDetails.databaseName = db.databaseName;
-    dbDetails.url = mongoURLLabel;
-    dbDetails.type = 'MongoDB';
-
-    console.log('Connected to MongoDB at: %s', mongoURL);
-  });
-};
-
-app.get('/', function (req, res) {
-  // try to initialize the db on every request if it's not already
-  // initialized.
-  if (!db) {
-    initDb(function(err){});
-  }
-  if (db) {
-    var col = db.collection('counts');
-    // Create a document with request IP and current time of request
-    col.insert({ip: req.ip, date: Date.now()});
-    col.count(function(err, count){
-      res.render('index.html', { pageCountMessage : count, dbInfo: dbDetails });
-    });
-  } else {
-    res.render('index.html', { pageCountMessage : null});
-  }
-});
-
-app.get('/pagecount', function (req, res) {
-  // try to initialize the db on every request if it's not already
-  // initialized.
-  if (!db) {
-    initDb(function(err){});
-  }
-  if (db) {
-    db.collection('counts').count(function(err, count ){
-      res.send('{ pageCount: ' + count + '}');
-    });
-  } else {
-    res.send('{ pageCount: -1 }');
-  }
-});
-
-// error handling
-app.use(function(err, req, res, next){
-  console.error(err.stack);
-  res.status(500).send('Something bad happened!');
-});
-
-initDb(function(err){
-  console.log('Error connecting to Mongo. Message:\n'+err);
-});
-
-/*app.listen(port, ip);
-console.log('Server running on 2 http://%s:%s', ip, port);*/
-
-module.exports = app ;
-
-     var http = require('http'),
-     server = http.createServer(app);
-
-     server = app.listen(port, ip, function() {
-            console.log('%s: Node server started on %s:%d ...',
-                Date(Date.now()), ip, port);
+    self.setupTerminationHandlers = function() {
+        //  Process on exit and signals.
+        process.on('exit', function() {
+            self.terminator();
         });
-     io = require('socket.io').listen(server);
 
-            io.on('connection', function(socket){
-              
-              socket.on('join:room', function(data) {
+        // Removed 'SIGPIPE' from the list - bugz 852598.
+        ['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
+            'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM'
+        ].forEach(function(element, index, array) {
+            process.on(element, function() {
+                self.terminator(element);
+            });
+        });
+    };
+    self.createRoutes = function() {
+        self.routes = {};
+        self.routes['/asciimo'] = function(req, res) {
+            var link = "http://i.imgur.com/kmbjB.png";
+            res.send("<html><body><img src='" + link + "'></body></html>");
+        };
 
-              console.log("join");
+        self.routes['/'] = function(req, res) {
+            res.setHeader('Content-Type', 'text/html');
+            res.send(self.cache_get('index.html'));
+        };
+    };
 
+    self.initializeServer = function() {
+        self.createRoutes();
+        self.app = express.createServer();
 
+        var http = require('http');
+        var app = express();
+        var server = http.createServer(app);
+    };
+
+    self.initialize = function() {
+        self.setupVariables();
+        self.populateCache();
+        self.setupTerminationHandlers();
+        self.initializeServer();
+    };
+
+    self.start = function() {
+      console.log("trying");
+        //  Start the app on the specific interface (and port).
+        self.server = self.app.listen(self.port, self.ipaddress, function() {
+            console.log('%s: Node server started on %s:%d ...',
+                Date(Date.now()), self.ipaddress, self.port);
+        });
+        self.io = require('socket.io').listen(self.server);
+
+        var room = "Home";
+        var users = [];
+
+        self.io.on('connection', function(socket) {
+
+       
+              socket.on('chat message', function(msg){
+                self.io.emit('chat message', msg, socket.user);
               });
 
 
-              socket.on('disconnect', function() {
+            socket.on('join:room', function(data) {
+
+                socket.join(room);
+                socket.room = room;
+
+                socket.id = data.id;
+                socket.user = data.user;
+
+                if(users.indexOf(data.id) != 0){
+                     users.push(data.id);
+                }
+                
+                self.io.in(socket.room).emit('users', users);
+
+            });
+         
+
+            socket.on('disconnect', function() {
               
-   /*             var index = users.indexOf(socket.id);
+                var index = users.indexOf(socket.id);
                 if (index >= 0) {
                   users.splice( index, 1 );
                 }
-*/
-                //socket.leave(socket.room);
 
-               //self.io.in(socket.room).emit('users', users);
+                socket.leave(socket.room);
+
+                self.io.in(socket.room).emit('users', users);
 
             });
+        });
+    };
+}; 
+
+var zapp = new SampleApp();
+zapp.initialize();
+zapp.start();
 
 
-
-});
-
-
-console.log('Rodando 7');
-//server.listen(8080, "127.0.0.1");
+  //self.io.sockets.adapter.rooms[room]
