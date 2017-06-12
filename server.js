@@ -111,7 +111,7 @@ module.exports = app ;
      server = http.createServer(app);
 
 
-     server = app.listen(port, ip, function() {
+     server = server.listen(port, ip, function() {
             console.log('%s: Node server!! started on %s:%d ...',
                 Date(Date.now()), ip, port);
         });
