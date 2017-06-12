@@ -127,9 +127,12 @@ module.exports = app ;
                 ]);
 
             io.on('connection', function(socket){
+socket.on('join:room', function(data) {
+
+console.log("join");
 
 
-
+});
             socket.on('disconnect', function() {
               
    /*             var index = users.indexOf(socket.id);
