@@ -111,38 +111,17 @@ module.exports = app ;
     server = http.createServer(app);
 
 
-    server = app.listen(port, ipaddress, function() {
+    server = app.listen(port, ip, function() {
             console.log('%s: Node server started on %s:%d ...',
-                Date(Date.now()), ipaddress, port);
+                Date(Date.now()), ip, port);
         });
 
    io = require('socket.io').listen(server);
 
-      var msg = {
-                'id': '',
-                'user': '',
-                'room': '',
-                'text': '',
-                'time': '',
-                'advice': true
-            };
 
 io.on('connection', function(socket){
 
-
-
-setInterval(function() {
-    util.log('Checking for new jobs...');
-    dbCheckQueue(function(results) {  // checks if there are new rows to "distribute" to clients
-        if (results.length) {
-            util.log(results.length + ' new jobs found.');
-            io.sockets.emit('job_available');
-        }
-    });
-}, 10*1000);
-
-
-
+console.log("vindo!!!!!!!!!!!!!!!!!!!!!!!!");
 
 });
 
