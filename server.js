@@ -112,7 +112,7 @@ module.exports = app ;
 
 
      server = app.listen(port, ip, function() {
-            console.log('%s: Node serverrrrrr started on %s:%d ...',
+            console.log('%s: Node server!! started on %s:%d ...',
                 Date(Date.now()), ip, port);
         });
      io = require('socket.io').listen(server);
@@ -120,10 +120,10 @@ module.exports = app ;
 
 io.on('connection', function(socket){
 
-/*console.log("vindo!!!!!!!!!!!!!!!!!!!!!!!!");*/
+console.log("vindo!!!!!!!!!!!!!!!!!!!!!!!!");
 
 });
 
 
-console.log('Rodando 2');
+console.log('Rodando 3');
 //server.listen(8080, "127.0.0.1");
