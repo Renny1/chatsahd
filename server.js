@@ -11,8 +11,8 @@ Object.assign=require('object-assign')
 app.engine('html', require('ejs').renderFile);
 app.use(morgan('combined'))
 
-var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
-    ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1',
+var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8000,
+    ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.1',
     mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL,
     mongoURLLabel = "";
 
@@ -111,7 +111,7 @@ module.exports = app ;
      server = http.createServer(app);
 
      server = app.listen(port, ip, function() {
-            console.log('%s: Node server!! started on %s:%d ...',
+            console.log('%s: Node server started on %s:%d ...',
                 Date(Date.now()), ip, port);
         });
      io = require('socket.io').listen(server);
@@ -127,5 +127,5 @@ io.on('connection', function(socket){
 });
 
 
-console.log('Rodando 6');
+console.log('Rodando 7');
 //server.listen(8080, "127.0.0.1");
