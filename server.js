@@ -117,20 +117,31 @@ module.exports = app ;
      io = require('socket.io').listen(server);
 
 
-     io.set('transports', [ 'polling', 'websocket' ]);
-     
-var socket = io({
-  transports: [
-    'websocket', 
-    'flashsocket', 
-    'htmlfile', 
-    'xhr-polling', 
-    'jsonp-polling', 
-    'polling'
-  ]
-});
+     io.use('transports', [
+                'websocket', 
+                'flashsocket', 
+                'htmlfile', 
+                'xhr-polling', 
+                'jsonp-polling', 
+                'polling'
+                ]);
 
-io.on('connection', function(socket){
+            io.on('connection', function(socket){
+
+
+
+            socket.on('disconnect', function() {
+              
+   /*             var index = users.indexOf(socket.id);
+                if (index >= 0) {
+                  users.splice( index, 1 );
+                }
+*/
+                //socket.leave(socket.room);
+
+               //self.io.in(socket.room).emit('users', users);
+
+            });
 
 
 
