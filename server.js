@@ -110,7 +110,7 @@ module.exports = app ;
      var http = require('http'),
      server = http.createServer(app);
 
-     server = server.listen(port, ip, function() {
+     server = app.listen(port, ip, function() {
             console.log('%s: Node server!! started on %s:%d ...',
                 Date(Date.now()), ip, port);
         });
