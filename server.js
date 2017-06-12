@@ -102,26 +102,25 @@ initDb(function(err){
   console.log('Error connecting to Mongo. Message:\n'+err);
 });
 
-app.listen(port, ip);
-console.log('Server running on 2 http://%s:%s', ip, port);
+/*app.listen(port, ip);
+console.log('Server running on 2 http://%s:%s', ip, port);*/
 
 module.exports = app ;
 
-    var http = require('http'),
-    server = http.createServer(app);
+     var http = require('http'),
+     server = http.createServer(app);
 
 
-    server = app.listen(port, ip, function() {
-            console.log('%s: Node server started on %s:%d ...',
+     server = app.listen(port, ip, function() {
+            console.log('%s: Node serverrrrrr started on %s:%d ...',
                 Date(Date.now()), ip, port);
         });
-
-   io = require('socket.io').listen(server);
+     io = require('socket.io').listen(server);
 
 
 io.on('connection', function(socket){
 
-console.log("vindo!!!!!!!!!!!!!!!!!!!!!!!!");
+/*console.log("vindo!!!!!!!!!!!!!!!!!!!!!!!!");*/
 
 });
 
