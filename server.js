@@ -101,7 +101,41 @@ initDb(function(err){
   console.log('Error connecting to Mongo. Message:\n'+err);
 });
 
-app.listen(port, ip);
+        app = express.createServer();
+
+        var http = require('http');
+        
+        var app = express();
+        
+        var server = http.createServer(app);
+
+
+        server = app.listen(port, ipaddress, function() {
+            console.log('%s: Node server started on %s:%d ...',
+                Date(Date.now()), ipaddress, port);
+        });
+
+
+        io = require('socket.io').listen(server);
+
+
+	    io.on('connection', function(socket) {
+
+	            socket.on('join:room', function(data) {
+
+	            });
+
+
+	            socket.on('disconnect', function() {
+	              
+
+	            });
+
+		});
+
+
+/*app.listen(port, ip);
 console.log('Server running on http://%s:%s', ip, port);
 
 module.exports = app ;
+*/
