@@ -9,8 +9,6 @@ var server = require('http').Server(app);
 // Websockets with socket.io
 var io = require('socket.io')(server);
 
-io.configure(function(){ io.set("transports", ["xhr-polling"]); });
-
 console.log("Trying to start server with config:", config.serverip + ":" + config.serverport);
 
 // Both port and ip are needed for the OpenShift, otherwise it tries 
