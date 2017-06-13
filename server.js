@@ -110,9 +110,9 @@ initDb(function(err){
         var server = http.createServer(app);
 
 
-        server = app.listen(port, ipaddress, function() {
+        server = app.listen(port, ip, function() {
             console.log('%s: Node server started on %s:%d ...',
-                Date(Date.now()), ipaddress, port);
+                Date(Date.now()), ip, port);
         });
 
 
