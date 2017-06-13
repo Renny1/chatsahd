@@ -118,7 +118,6 @@ initDb(function(err){
 
         io = require('socket.io').listen(server);
 
-
 	    io.on('connection', function(socket) {
 
 	            socket.on('join:room', function(data) {
