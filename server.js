@@ -1,145 +1,43 @@
-#!/bin/env node
- //  OpenShift sample Node application
+// Check the configuration file for more details
+var config = require('./config');
+
+// Express.js stuff
 var express = require('express');
-var fs = require('fs');
+var app = require('express')();
+var server = require('http').Server(app);
 
+// Websockets with socket.io
+var io = require('socket.io')(server);
 
-var SampleApp = function() {
-    var self = this;
-    self.setupVariables = function() {
-        //  Set the environment variables we need.
-        self.ipaddress = process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
-        self.port = process.env.OPENSHIFT_NODEJS_PORT || 8080;
+console.log("Trying to start server with config:", config.serverip + ":" + config.serverport);
 
-        if (typeof self.ipaddress === "undefined") {
-            //  Log errors on OpenShift but continue w/ 0.0.0.1 - this
-            //  allows us to run/test the app locally.
-            console.warn('No OPENSHIFT_NODEJS_IP var, using 0.0.0.0');
-            self.ipaddress = "0.0.0.0";
-        };
-    };
+// Both port and ip are needed for the OpenShift, otherwise it tries 
+// to bind server on IP 0.0.0.0 (or something) and fails
+server.listen(config.serverport, config.serverip, function() {
+  console.log("Server running @ http://" + config.serverip + ":" + config.serverport);
+});
 
-    self.populateCache = function() {
-        if (typeof self.zcache === "undefined") {
-            self.zcache = {
-                'index.html': ''
-            };
-        }
-        self.zcache['index.html'] = fs.readFileSync('./index.html');
-    };
-    self.cache_get = function(key) {
-        return self.zcache[key];
-    };
+// Allow some files to be server over HTTP
+app.use(express.static(__dirname + '/'));
 
-    self.terminator = function(sig) {
-        if (typeof sig === "string") {
-            console.log('%s: Received %s - terminating sample app ...',
-                Date(Date.now()), sig);
-            process.exit(1);
-        }
-        console.log('%s: Node server stopped.', Date(Date.now()));
-    };
+// Serve GET on http://domain/
+app.get('/', function (req, res) {
+  res.sendFile(__dirname + '/index.html');
+});
 
-    self.setupTerminationHandlers = function() {
-        //  Process on exit and signals.
-        process.on('exit', function() {
-            self.terminator();
-        });
+// Server GET on http://domain/api/config
+// A hack to provide client the system config
+app.get('/api/config', function(req, res) {
+  res.send('var config = ' + JSON.stringify(config));
+});
 
-        // Removed 'SIGPIPE' from the list - bugz 852598.
-        ['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
-            'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM'
-        ].forEach(function(element, index, array) {
-            process.on(element, function() {
-                self.terminator(element);
-            });
-        });
-    };
-    self.createRoutes = function() {
-        self.routes = {};
-        self.routes['/asciimo'] = function(req, res) {
-            var link = "http://i.imgur.com/kmbjB.png";
-            res.send("<html><body><img src='" + link + "'></body></html>");
-        };
+// And finally some websocket stuff
+io.on('connection', function (socket) { // Incoming connections from clients
+  // Greet the newcomer
+  socket.emit('hello', { greeting: 'Hi socket ' + socket.id + ' this is Server speaking! Let\'s play ping-pong. You pass!' });
 
-        self.routes['/'] = function(req, res) {
-            res.setHeader('Content-Type', 'text/html');
-            res.send(self.cache_get('index.html'));
-        };
-    };
-
-    self.initializeServer = function() {
-        self.createRoutes();
-        self.app = express.createServer();
-
-        var http = require('http');
-        var app = express();
-        var server = http.createServer(app);
-    };
-
-    self.initialize = function() {
-        self.setupVariables();
-        self.populateCache();
-        self.setupTerminationHandlers();
-        self.initializeServer();
-    };
-
-    self.start = function() {
-      console.log("trying");
-        //  Start the app on the specific interface (and port).
-        self.server = self.app.listen(self.port, self.ipaddress, function() {
-            console.log('%s: Node server started on %s:%d ...',
-                Date(Date.now()), self.ipaddress, self.port);
-        });
-        self.io = require('socket.io').listen(self.server);
-
-        var room = "Home";
-        var users = [];
-
-        self.io.on('connection', function(socket) {
-
-       
-              socket.on('chat message', function(msg){
-                self.io.emit('chat message', msg, socket.user);
-              });
-
-
-            socket.on('join:room', function(data) {
-
-                socket.join(room);
-                socket.room = room;
-
-                socket.id = data.id;
-                socket.user = data.user;
-
-                if(users.indexOf(data.id) != 0){
-                     users.push(data.id);
-                }
-                
-                self.io.in(socket.room).emit('users', users);
-
-            });
-         
-
-            socket.on('disconnect', function() {
-              
-                var index = users.indexOf(socket.id);
-                if (index >= 0) {
-                  users.splice( index, 1 );
-                }
-
-                socket.leave(socket.room);
-
-                self.io.in(socket.room).emit('users', users);
-
-            });
-        });
-    };
-}; 
-
-var zapp = new SampleApp();
-zapp.initialize();
-zapp.start();
-
-
-  //self.io.sockets.adapter.rooms[room]
+  socket.on('ping', function (data) { // ping-event from the client to be respond with pong
+    console.log("received ping from client: ", data);
+    socket.emit('pong', { id: data.id });
+  });
+});
