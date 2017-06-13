@@ -101,6 +101,8 @@ initDb(function(err){
   console.log('Error connecting to Mongo. Message:\n'+err);
 });
 
+module.exports = app ;
+
         app = express.createServer();
 
         var http = require('http');
@@ -120,22 +122,50 @@ initDb(function(err){
 
 	    io.on('connection', function(socket) {
 
-	            socket.on('join:room', function(data) {
+              socket.on('chat message', function(msg){
 
-	            	console.log("teste");
+                self.io.emit('chat message', msg, socket.user);
+              
+                   var nameSepare = socket.user.split(" ");
+                   msgs.unshift("<b>" + nameSepare[0] + " "  + nameSepare[1] + "</b>: " + msg);
 
-	            });
+                    if(msgs.length > 35){
+                        msgs.splice(-1,1);
+                    }
+              });
 
+            socket.on('join:room', function(data) {
 
-	            socket.on('disconnect', function() {
-	              
+                socket.join(room);
+                socket.room = room;
 
-	            });
+                socket.id = data.id;
+                socket.user = data.user;
 
+                if(users.indexOf(data.id) != 0){
+                     users.push(data.id);
+                }
+                
+                self.io.in(socket.room).emit('users', users);
+                socket.to(socket.room).emit('updateMessages', msgs);
+
+            });
+
+            socket.on('disconnect', function() {
+              
+                var index = users.indexOf(socket.id);
+                if (index >= 0) {
+                  users.splice( index, 1 );
+                }
+
+                socket.leave(socket.room);
+
+                self.io.in(socket.room).emit('users', users);
+
+            });
 		});
 
 
 /*app.listen(port, ip);
 console.log('Server running on http://%s:%s', ip, port);
 */
-module.exports = app ;
