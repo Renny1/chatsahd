@@ -34,7 +34,7 @@ app.get('/api/config', function(req, res) {
 // And finally some websocket stuff
 io.on('connection', function (socket) { // Incoming connections from clients
   // Greet the newcomer
-  socket.emit('hello', { greeting: 'Hi socket ' + socket.id + ' this is Server speaking! Let\'s play ping-pong. You pass!' });
+  //socket.emit('hello', { greeting: 'Hi socket ' + socket.id + ' this is Server speaking! Let\'s play ping-pong. You pass!' });
 
   socket.on('ping', function (data) { // ping-event from the client to be respond with pong
     console.log("received ping from client: ", data);
