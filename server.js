@@ -122,6 +122,8 @@ initDb(function(err){
 
 	            socket.on('join:room', function(data) {
 
+	            	console.log("teste");
+
 	            });
 
 
@@ -135,6 +137,5 @@ initDb(function(err){
 
 /*app.listen(port, ip);
 console.log('Server running on http://%s:%s', ip, port);
-
-module.exports = app ;
 */
+module.exports = app ;
