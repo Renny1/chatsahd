@@ -117,8 +117,13 @@ module.exports = app ;
                 Date(Date.now()), ip, port);
         });
 
-
         io = require('socket.io').listen(server);
+
+
+        var room = "Home";
+        var users = [];
+        var msgs = [];
+
 
 	    io.on('connection', function(socket) {
 
