@@ -113,7 +113,7 @@ module.exports = app ;
 
 
         server = app.listen(port, ip, function() {
-            console.log('%s: Node server started on %s:%d ...',
+            console.log('%s: Node server 2 started on %s:%d ...',
                 Date(Date.now()), ip, port);
         });
 
