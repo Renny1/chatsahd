@@ -136,18 +136,28 @@ module.exports = app ;
 
             socket.on('join:room', function(data) {
 
+            	console.log("indo");
+
                 socket.join(room);
                 socket.room = room;
 
+                console.log("indo2");
+
                 socket.id = data.id;
                 socket.user = data.user;
+
+                console.log("indo3");
 
                 if(users.indexOf(data.id) != 0){
                      users.push(data.id);
                 }
                 
+                console.log("ind4");
+
                 self.io.in(socket.room).emit('users', users);
                 socket.to(socket.room).emit('updateMessages', msgs);
+
+				console.log("indo5");
 
             });
 
