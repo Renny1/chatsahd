@@ -129,7 +129,7 @@ module.exports = app ;
 
               socket.on('chat message', function(msg){
 
-                self.io.emit('chat message', msg, socket.user);
+                io.emit('chat message', msg, socket.user);
               
                    var nameSepare = socket.user.split(" ");
                    msgs.unshift("<b>" + nameSepare[0] + " "  + nameSepare[1] + "</b>: " + msg);
@@ -159,7 +159,7 @@ module.exports = app ;
                 
                 console.log("ind4");
 
-                self.io.in(socket.room).emit('users', users);
+                io.in(socket.room).emit('users', users);
                 socket.to(socket.room).emit('updateMessages', msgs);
 
 				console.log("indo5");
@@ -175,7 +175,7 @@ module.exports = app ;
 
                 socket.leave(socket.room);
 
-                self.io.in(socket.room).emit('users', users);
+                io.in(socket.room).emit('users', users);
 
             });
 		});
