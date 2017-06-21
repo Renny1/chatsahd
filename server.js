@@ -139,18 +139,22 @@ module.exports = app ;
                     }
               });
 
+           socket.on('connect',function(){
+
+              io.in(socket.room).emit('teste', "teste");
+
+          });
+
+
             socket.on('join:room', function(data) {
 
                 socket.join(room);
                 socket.room = room;
-
                 socket.id = data.id;
                 socket.user = data.user;
-
                 if(users.indexOf(data.id) != 0){
                      users.push(data.id);
                 }
-                
                 io.in(socket.room).emit('users', users);
                 socket.to(socket.room).emit('updateMessages', msgs);
 
