@@ -171,6 +171,9 @@ module.exports = app ;
 
                 io.in(socket.room).emit('users', users);
 
+                socket.to(socket.room).emit('disconnect', "teste");
+
+
             });
 		});
 
