@@ -101,80 +101,29 @@ initDb(function(err){
   console.log('Error connecting to Mongo. Message:\n'+err);
 });
 
-module.exports = app ;
-
+        module.exports = app ;
         app = express.createServer();
-
         var http = require('http');
-        
         var app = express();
-        
         var server = http.createServer(app);
-
-
         server = app.listen(port, ip, function() {
             console.log('%s: Node server 2 started on %s:%d ...',
                 Date(Date.now()), ip, port);
         });
-
         io = require('socket.io').listen(server);
 
-
-        var room = "Home";
-        var users = [];
-        var msgs = [];
-
-
 	    io.on('connection', function(socket) {
+            console.log('User Connected');
+            socket.on('message', function(msg){
+                socket.emit('message', msg);
+                io.emit('message', msg);
+            });
 
-              socket.on('chat message', function(msg){
-
-                io.emit('chat message', msg, socket.user);
-              
-                   var nameSepare = socket.user.split(" ");
-                   msgs.unshift("<b>" + nameSepare[0] + " "  + nameSepare[1] + "</b>: " + msg);
-
-                    if(msgs.length > 35){
-                        msgs.splice(-1,1);
-                    }
-              });
 
            socket.on('connect',function(){
-
-              io.in(socket.room).emit('teste', "teste");
-
+                socket.emit('message', msg);
+                io.emit('message', msg);
           });
-
-
-            socket.on('join:room', function(data) {
-
-                socket.join(room);
-                socket.room = room;
-                socket.id = data.id;
-                socket.user = data.user;
-                if(users.indexOf(data.id) != 0){
-                     users.push(data.id);
-                }
-                io.in(socket.room).emit('users', users);
-                socket.to(socket.room).emit('updateMessages', msgs);
-
-            });
-
-            socket.on('disconnect', function() {
-              
-                var index = users.indexOf(socket.id);
-                if (index >= 0) {
-                  users.splice( index, 1 );
-                }
-
-                socket.leave(socket.room);
-
-                io.in(socket.room).emit('users', users);
-
-                socket.to(socket.room).emit('disconnect', socket.id);
-
-
-            });
 		});
 
 
